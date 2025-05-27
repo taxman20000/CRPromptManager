@@ -13,7 +13,7 @@ Security: Security patches (critical to highlight).
 - Add ability to use OpenAI
 - Update Chat to use json schema for first call and then ignore subsequently instead of warn and skip
 
-## [0.1.2] - TBD
+## [0.1.2] - 2005-05-27
 ### Added
 - Migrated from WrapAIVenice to WrapAI
 - threading support in dialog_prompt_runner.py

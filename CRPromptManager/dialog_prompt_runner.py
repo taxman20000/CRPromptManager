@@ -227,9 +227,12 @@ class PromptRunDialog(QDialog):
                 )
                 self.response_display.setHtml(formatted_html)
                 self.response_display.moveCursor(QTextCursor.MoveOperation.End)
+                self.prompt_display.clear()
 
             self.details_button.setEnabled(True)
             self.citations = self.response.citations if self.response.citations is not None else []
+            self.prompt_display.setFocus()
+            self.prompt_display.moveCursor(QTextCursor.MoveOperation.End)
 
         def on_error(error_info):
             exception, tb = error_info
@@ -413,4 +416,4 @@ class PromptRunDialog(QDialog):
         else:
             self.runner = None  # For text/question mode, just clear runner
 
-        print(f"Model changed to: {self.model} (chat memory preserved)")
+        logger.info(f"Model changed to: {self.model} (chat memory preserved)")
