@@ -1,8 +1,15 @@
 # dialog_prompt_runner.py
 
 from PySide6.QtWidgets import (
-    QDialog, QVBoxLayout, QHBoxLayout, QLabel, QTextEdit, QPushButton,
-    QMessageBox, QTabWidget, QComboBox
+    QDialog,
+    QVBoxLayout,
+    QHBoxLayout,
+    QLabel,
+    QTextEdit,
+    QPushButton,
+    QMessageBox,
+    QTabWidget,
+    QComboBox,
 )
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QTextCursor
@@ -12,22 +19,41 @@ import re
 from pathlib import Path
 
 import logging
+
 logger = logging.getLogger(__name__)
 
 # from WrapAIVenice import VeniceTextPrompt, VeniceChatPrompt, PromptTemplate, FILE_HANDLERS, PromptAttributes
-from WrapAI import VeniceTextPrompt, VeniceChatPrompt, PromptTemplate, FILE_HANDLERS, parse_response_with_schema
-from WrapSideSix import (run_in_thread, WSProgressHandler,
-                         WSGridLayoutHandler, WSGridRecord, WSGridPosition
-                         )
-from dialog_placeholder import PlaceholderDialog
-from cp_core import (PROMPT_TYPE_QUESTION, PROMPT_TYPE_CHAT)
-from cp_core import populate_model_combo_list, get_model_attributes
+from WrapAI import (
+    VeniceTextPrompt,
+    VeniceChatPrompt,
+    PromptTemplate,
+    FILE_HANDLERS,
+    parse_response_with_schema,
+)
+from WrapSideSix import (
+    run_in_thread,
+    WSProgressHandler,
+    WSGridLayoutHandler,
+    WSGridRecord,
+    WSGridPosition,
+)
+from .dialog_placeholder import PlaceholderDialog
+from .cp_core import PROMPT_TYPE_QUESTION, PROMPT_TYPE_CHAT
+from .cp_core import populate_model_combo_list, get_model_attributes
 from WrapConfig import RuntimeConfig
 
 
 class PromptRunDialog(QDialog):
-    def __init__(self, api_key, model, prompt_text, response_type=PROMPT_TYPE_QUESTION, system_prompt="You are a helpful assistant.",
-                 attributes=None, parent=None):
+    def __init__(
+        self,
+        api_key,
+        model,
+        prompt_text,
+        response_type=PROMPT_TYPE_QUESTION,
+        system_prompt="You are a helpful assistant.",
+        attributes=None,
+        parent=None,
+    ):
         super().__init__(parent)
         self.setWindowTitle("Run Prompt")
         self.setMinimumSize(800, 600)
@@ -40,7 +66,7 @@ class PromptRunDialog(QDialog):
         self.model = model
         self.run_time = RuntimeConfig()
         # self.prompt_text = prompt_text
-        self.prompt_text = re.sub(r'@@\s*[\w.-]+\s*@@', '', prompt_text)
+        self.prompt_text = re.sub(r"@@\s*[\w.-]+\s*@@", "", prompt_text)
 
         self.response_type = response_type
         self.system_prompt = system_prompt
@@ -70,7 +96,7 @@ class PromptRunDialog(QDialog):
         self.connect_signals()
 
     def init_ui(self):
-        if self.response_type== PROMPT_TYPE_QUESTION:
+        if self.response_type == PROMPT_TYPE_QUESTION:
             prompt_row = 0
             response_row = 2
         elif self.response_type == PROMPT_TYPE_CHAT:
@@ -87,54 +113,78 @@ class PromptRunDialog(QDialog):
 
         # Grid setup
         model_widgets = [
-            WSGridRecord(widget=QLabel("Model:"),
-                         position=WSGridPosition(row=0, column=0),
-                         alignment=Qt.AlignmentFlag.AlignLeft,
-                         col_stretch=0),
-            WSGridRecord(widget=self.model_combobox,
-                         position=WSGridPosition(row=0, column=1),
-                         # alignment = Qt.AlignmentFlag.AlignTrailing,
-                         col_stretch=10)
+            WSGridRecord(
+                widget=QLabel("Model:"),
+                position=WSGridPosition(row=0, column=0),
+                alignment=Qt.AlignmentFlag.AlignLeft,
+                col_stretch=0,
+            ),
+            WSGridRecord(
+                widget=self.model_combobox,
+                position=WSGridPosition(row=0, column=1),
+                # alignment = Qt.AlignmentFlag.AlignTrailing,
+                col_stretch=10,
+            ),
         ]
         self.model_grid.add_widget_records(model_widgets)
 
         question_response_widgets = [
-            WSGridRecord(widget=QLabel("Prompt:"),
-                         position=WSGridPosition(row=prompt_row, column=0),
-                         col_stretch=1),
-            WSGridRecord(widget=self.prompt_display,
-                         position=WSGridPosition(row=prompt_row+1, column=0),
-                         col_stretch=3),
-            WSGridRecord(widget=QLabel("Response:"),
-                         position=WSGridPosition(row=response_row, column=0),
-                         col_stretch=1),
-            WSGridRecord(widget=self.response_display,
-                         position=WSGridPosition(row=response_row+1, column=0),
-                         col_stretch=3),
+            WSGridRecord(
+                widget=QLabel("Prompt:"),
+                position=WSGridPosition(row=prompt_row, column=0),
+                col_stretch=1,
+            ),
+            WSGridRecord(
+                widget=self.prompt_display,
+                position=WSGridPosition(row=prompt_row + 1, column=0),
+                col_stretch=3,
+            ),
+            WSGridRecord(
+                widget=QLabel("Response:"),
+                position=WSGridPosition(row=response_row, column=0),
+                col_stretch=1,
+            ),
+            WSGridRecord(
+                widget=self.response_display,
+                position=WSGridPosition(row=response_row + 1, column=0),
+                col_stretch=3,
+            ),
         ]
         self.question_response_grid.add_widget_records(question_response_widgets)
 
         button_grid_widgets = [
-            WSGridRecord(widget=self.run_button,
-                         position=WSGridPosition(row=0, column=0),
-                         col_stretch=0),
-            WSGridRecord(widget=self.details_button,
-                         position=WSGridPosition(row=0, column=1),
-                         col_stretch=0),
-            WSGridRecord(widget=self.close_button,
-                         position=WSGridPosition(row=0, column=2),
-                         col_stretch=0),
+            WSGridRecord(
+                widget=self.run_button,
+                position=WSGridPosition(row=0, column=0),
+                col_stretch=0,
+            ),
+            WSGridRecord(
+                widget=self.details_button,
+                position=WSGridPosition(row=0, column=1),
+                col_stretch=0,
+            ),
+            WSGridRecord(
+                widget=self.close_button,
+                position=WSGridPosition(row=0, column=2),
+                col_stretch=0,
+            ),
         ]
 
         self.button_grid.add_widget_records(button_grid_widgets)
 
         main_grid_widgets = [
-            WSGridRecord(widget=self.model_grid.as_widget(),
-                         position=WSGridPosition(row=0, column=0)),
-            WSGridRecord(widget=self.question_response_grid.as_widget(),
-                         position=WSGridPosition(row=1, column=0)),
-            WSGridRecord(widget=self.button_grid.as_widget(),
-                         position=WSGridPosition(row=2, column=0)),
+            WSGridRecord(
+                widget=self.model_grid.as_widget(),
+                position=WSGridPosition(row=0, column=0),
+            ),
+            WSGridRecord(
+                widget=self.question_response_grid.as_widget(),
+                position=WSGridPosition(row=1, column=0),
+            ),
+            WSGridRecord(
+                widget=self.button_grid.as_widget(),
+                position=WSGridPosition(row=2, column=0),
+            ),
         ]
         self.main_grid.add_widget_records(main_grid_widgets)
 
@@ -165,14 +215,15 @@ class PromptRunDialog(QDialog):
         self.runner_mode = mode
         return self.runner
 
-
     def run_prompt(self):
         if not self.validate_prompt():
             return
 
         self.run_button.setEnabled(False)
 
-        self.progress = WSProgressHandler(self, use_dialog=True, title="Running AI Prompt", indeterminate=True)
+        self.progress = WSProgressHandler(
+            self, use_dialog=True, title="Running AI Prompt", indeterminate=True
+        )
         self.progress.show()
 
         raw_prompt = self.prompt_display.toPlainText()
@@ -181,7 +232,9 @@ class PromptRunDialog(QDialog):
 
         def task(**kwargs):
             self.runner = self.get_runner()
-            return self.runner.prompt(self.formatted_prompt, system_prompt=self.system_prompt)
+            return self.runner.prompt(
+                self.formatted_prompt, system_prompt=self.system_prompt
+            )
 
         def on_start():
             logger.info("Prompt started...")
@@ -192,10 +245,16 @@ class PromptRunDialog(QDialog):
             self.run_button.setEnabled(True)
 
             if not self.response:
-                QMessageBox.warning(self, "No Response", "No response returned from the API.")
+                QMessageBox.warning(
+                    self, "No Response", "No response returned from the API."
+                )
                 return
 
-            text = self.response.response if self.response.response is not None else "No response available."
+            text = (
+                self.response.response
+                if self.response.response is not None
+                else "No response available."
+            )
 
             schema_json = self.prompt_attributes.get("response_format")
             use_json = schema_json is not None and isinstance(schema_json, dict)
@@ -206,12 +265,17 @@ class PromptRunDialog(QDialog):
                         parsed_data = parse_response_with_schema(
                             response_json=json.loads(text),
                             schema_json=schema_json,
-                            include_missing_optionals=False
+                            include_missing_optionals=False,
                         )
-                        formatted = "\n\n".join(f"=== {key} ===\n{value}" for key, value in parsed_data.items())
+                        formatted = "\n\n".join(
+                            f"=== {key} ===\n{value}"
+                            for key, value in parsed_data.items()
+                        )
                         self.response_display.setPlainText(formatted)
                     except Exception as e:
-                        logger.warning(f"Failed to parse JSON response with schema: {e}")
+                        logger.warning(
+                            f"Failed to parse JSON response with schema: {e}"
+                        )
                         self.response_display.setPlainText(text)
                 else:
                     self.response_display.setPlainText(text)
@@ -219,18 +283,20 @@ class PromptRunDialog(QDialog):
             if self.response_type == PROMPT_TYPE_CHAT:
                 existing_html = self.response_display.toHtml()
                 formatted_html = (
-                    f'{existing_html}'
+                    f"{existing_html}"
                     f'<div align="left" style="background-color:#f0f0f0; padding:8px; margin-top:1em; border-radius:6px; white-space:pre-wrap;">'
-                    f'{self.formatted_prompt}</div>'
+                    f"{self.formatted_prompt}</div>"
                     f'<div align="right" style="background-color:#e8f4ff; padding:8px; margin-top:0.5em; border-radius:6px; white-space:pre-wrap;">'
-                    f'{text}</div>'
+                    f"{text}</div>"
                 )
                 self.response_display.setHtml(formatted_html)
                 self.response_display.moveCursor(QTextCursor.MoveOperation.End)
                 self.prompt_display.clear()
 
             self.details_button.setEnabled(True)
-            self.citations = self.response.citations if self.response.citations is not None else []
+            self.citations = (
+                self.response.citations if self.response.citations is not None else []
+            )
             self.prompt_display.setFocus()
             self.prompt_display.moveCursor(QTextCursor.MoveOperation.End)
 
@@ -242,11 +308,7 @@ class PromptRunDialog(QDialog):
             self.run_button.setEnabled(True)
 
         run_in_thread(
-            task,
-            on_finish=on_finish,
-            on_error=on_error,
-            on_start=on_start,
-            parent=self
+            task, on_finish=on_finish, on_error=on_error, on_start=on_start, parent=self
         )
 
     def show_detailed_response(self):
@@ -283,7 +345,13 @@ class PromptRunDialog(QDialog):
         add_tab("Parameters", json.dumps(self.response.parameters or {}, indent=4))
 
         # For full JSON, convert the entire PromptResponse object to a dict first
-        add_tab("Full JSON", json.dumps(self.response.to_dict() if hasattr(self.response, "to_dict") else {}, indent=4))
+        add_tab(
+            "Full JSON",
+            json.dumps(
+                self.response.to_dict() if hasattr(self.response, "to_dict") else {},
+                indent=4,
+            ),
+        )
 
         # Add Citations tab
         citations = getattr(self.response, "citations", [])
@@ -293,13 +361,17 @@ class PromptRunDialog(QDialog):
                 citations_lines.append(f"📰 {cite.get('title', 'No Title')}")
                 citations_lines.append(f"📅 Date: {cite.get('date', 'No Date')}")
                 citations_lines.append(f"🔗 URL: {cite.get('url', 'No URL')}")
-                citations_lines.append(f"📝 Summary: {cite.get('content', 'No Summary')}\n")
+                citations_lines.append(
+                    f"📝 Summary: {cite.get('content', 'No Summary')}\n"
+                )
             citations_text = "\n".join(citations_lines)
             add_tab("Citations", citations_text)
 
         if isinstance(self.runner, VeniceChatPrompt):
             history = self.runner.memory.message_history
-            formatted = "\n\n".join(f"{m['role'].capitalize()}: {m['content']}" for m in history)
+            formatted = "\n\n".join(
+                f"{m['role'].capitalize()}: {m['content']}" for m in history
+            )
             add_tab("Chat History", formatted)
 
         close_btn = QPushButton("Close")
@@ -315,9 +387,7 @@ class PromptRunDialog(QDialog):
     def build_prompt_text(self, raw_prompt_text: str) -> str:
         """Replaces both variable and file placeholders properly before sending the prompt."""
         temp_prompt = PromptTemplate(
-            type="user",
-            subtype="",
-            prompt_text=raw_prompt_text
+            type="user", subtype="", prompt_text=raw_prompt_text
         )
 
         placeholders = temp_prompt.get_placeholders()
@@ -355,7 +425,9 @@ class PromptRunDialog(QDialog):
         # 🔹 Replace variable placeholders
         for ph in placeholders:
             if ph in values:
-                prompt_text = re.sub(fr"<<\s*{re.escape(ph)}\s*>>", values[ph], prompt_text)
+                prompt_text = re.sub(
+                    rf"<<\s*{re.escape(ph)}\s*>>", values[ph], prompt_text
+                )
 
         return prompt_text
 
@@ -371,12 +443,14 @@ class PromptRunDialog(QDialog):
         logger.debug(f"Reasoning: {caps.get("supportsReasoning")}")
 
         # Get prompt information
-        logger.debug('Prompt information')
+        logger.debug("Prompt information")
         logger.debug(f"Attribute: {self.prompt_attributes}")
         logger.debug(f"Prompt Response Type: {self.response_type}")
         logger.debug(f"Json format: {self.prompt_attributes.get('response_format')}")
 
-        prompt_formatted_response = self.prompt_attributes.get('response_format') is not None
+        prompt_formatted_response = (
+            self.prompt_attributes.get("response_format") is not None
+        )
         model_formatted_response = caps.get("supportsResponseSchema")
 
         # Condition 1: Chat type with JSON response not allowed
@@ -385,7 +459,7 @@ class PromptRunDialog(QDialog):
                 self,
                 "Invalid Prompt Type",
                 "You cannot use a JSON-formatted response (response_format) with chat prompts.\n"
-                "Please switch to a standard prompt type or remove the response_format."
+                "Please switch to a standard prompt type or remove the response_format.",
             )
             return False
 
@@ -395,21 +469,28 @@ class PromptRunDialog(QDialog):
                 self,
                 "Model Incompatible",
                 f"The selected model ({self.model}) does not support structured JSON responses (response_schema).\n"
-                "Please select a compatible model or remove the response_format from the prompt."
+                "Please select a compatible model or remove the response_format from the prompt.",
             )
             return False
 
         return True
 
     def populate_model_combobox(self, refresh=False):
-        populate_model_combo_list(self.model_combobox, self.model, self.api_key, self.run_time, refresh=refresh)
-
+        populate_model_combo_list(
+            self.model_combobox,
+            self.model,
+            self.api_key,
+            self.run_time,
+            refresh=refresh,
+        )
 
     def update_model(self):
         self.model = self.model_combobox.currentData()
 
         # If in chat mode, preserve memory across runner swaps
-        if self.response_type == PROMPT_TYPE_CHAT and isinstance(self.runner, VeniceChatPrompt):
+        if self.response_type == PROMPT_TYPE_CHAT and isinstance(
+            self.runner, VeniceChatPrompt
+        ):
             old_memory = self.runner.memory
             self.runner = VeniceChatPrompt(self.api_key, self.model)
             self.runner.memory = old_memory  # Transfer whole ConversationMemory object

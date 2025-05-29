@@ -5,6 +5,40 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "CRPromptManager"
 version = "0.1.0"
+requires-python = ">=3.13"
 dependencies = [
-    "requests>=2.31.0"
+    "requests>=2.31.0",
+]
+
+[project.optional-dependencies]
+wrapdeps-remote = ["wrapdataclass","wrapsidesix","wrapconfig","wrapai"]
+wrapdeps-local = ["wrapdataclass","wrapsidesix","wrapconfig","wrapai"]
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.uv]
+conflicts = [
+    [
+        { extra = "wrapdeps-remote" },
+        { extra = "wrapdeps-local" },
+    ]
+]
+
+[tool.uv.sources]
+"wrapdataclass" = [
+    { git = "https://github.com/taxman20000/WrapDataclass.git", extra = "wrapdeps-remote"},
+    { path = "../WrapDataclass", extra = "wrapdeps-local"}
+]
+"wrapsidesix" = [
+    { git = "https://github.com/taxman20000/WrapSideSix.git", extra = "wrapdeps-remote"},
+    { path = "../WrapSideSix", extra = "wrapdeps-local"}
+]
+"wrapconfig" = [
+    { git = "https://github.com/taxman20000/WrapConfig.git", extra = "wrapdeps-remote"},
+    { path = "../WrapConfig", extra = "wrapdeps-local"}
+]
+"wrapai" = [
+    { git = "https://github.com/taxman20000/WrapAI.git", extra = "wrapdeps-remote"},
+    { path = "../WrapAI", extra = "wrapdeps-local"}
 ]

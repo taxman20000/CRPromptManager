@@ -11,7 +11,30 @@ A powerful Python library for creating and managing AI chat prompts with a user-
 - **Backup System**: Automatic backup of your prompts and settings
 - **Cross-Platform**: Works on Windows, macOS, and Linux
 
-## Installation
+## uv quickstart and installation
+```bash
+# Clone the repository
+git clone https://github.com/taxman20000/CRPromptManager.git
+cd CRPromptManager
+
+# Run using Wrap dependencies sourced from GitHub
+uv run --with ".[wrapdeps-remote]" -m CRPromptManager.main
+
+```
+
+# uv development of wrap libraries
+```bash
+git clone https://github.com/taxman20000/CRPromptManager.git
+git clone https://github.com/taxman20000/WrapDataclass.git
+git clone https://github.com/taxman20000/WrapSideSix.git
+git clone https://github.com/taxman20000/WrapConfig.git
+git clone https://github.com/taxman20000/WrapAI.git
+cd CRPromptManager
+# Run using Wrap dependencies sourced from local drive
+uv run --with ".[wrapdeps-local]" -m CRPromptManager.main
+```
+
+## Pip Installation
 
 ```bash
 # Clone the repository
