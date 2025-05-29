@@ -179,3 +179,8 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# config file for CRPromptManager
+CRPromptManager/CRSettings.ini
+# uv files
+uv.lock

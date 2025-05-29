@@ -1,14 +1,21 @@
 # dialog_about.py
 
 import sys
-from PySide6.QtWidgets import QApplication, QDialog, QVBoxLayout, QLabel, QPushButton, QFrame
+from PySide6.QtWidgets import (
+    QApplication,
+    QDialog,
+    QVBoxLayout,
+    QLabel,
+    QPushButton,
+    QFrame,
+)
 from PySide6.QtCore import Qt
 import logging
 
 # Logger Configuration
 logger = logging.getLogger(__name__)
 
-from version import __version__ as program_version
+from .version import __version__ as program_version
 
 
 class AboutDialog(QDialog):
@@ -26,7 +33,6 @@ class AboutDialog(QDialog):
         # pixmap = QPixmap("path_to_logo.png")
         # logo_label.setPixmap(pixmap)
         # layout.addWidget(logo_label, alignment=Qt.AlignmentFlag.AlignCenter)
-
 
         # Description with versions
         description_label = QLabel("ChatRecall PromptManager", self)
